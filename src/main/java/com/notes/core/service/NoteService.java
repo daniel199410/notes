@@ -61,4 +61,12 @@ public class NoteService {
     public List<NoteModel> getByTitle(String title) {
         return converter.convertList(noteRepository.findByTitle(title));
     }
+
+    public Note getNote(long id) {
+        return noteRepository.findById(id);
+    }
+
+    public Note getNote(String name) {
+        return noteRepository.findByName(name);
+    }
 }

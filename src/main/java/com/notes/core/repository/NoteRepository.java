@@ -9,9 +9,8 @@ import java.util.List;
 
 @Repository("noteRepository")
 public interface NoteRepository extends JpaRepository<Note, Serializable> {
-    Note findByName(String name);
-    List<Note> findByTitle(String title);
-    Note findByNameAndTitle(String name, String title);
     Note findById(long id);
-    Note findByIdAndName(long id, String name);
+    Note findByName(String name);
+    Note findByNameAndTitle(String name, String title);
+    List<Note> findByTitle(String title);
 }
