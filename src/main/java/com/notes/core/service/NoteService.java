@@ -7,18 +7,21 @@ import com.notes.core.repository.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 @Service("noteService")
 public class NoteService {
-    @Autowired
-    @Qualifier("noteRepository")
-    private NoteRepository noteRepository;
+    private final NoteRepository noteRepository;
+
+    private final Converter converter;
 
     @Autowired
-    @Qualifier("converter")
-    private Converter converter;
+    public NoteService(@Qualifier("noteRepository") NoteRepository noteRepository, @Qualifier("converter") Converter converter) {
+        this.noteRepository = noteRepository;
+        this.converter = converter;
+    }
 
     public boolean create(Note note) {
         try {
@@ -50,8 +53,15 @@ public class NoteService {
 
     public List<NoteModel> getNotes() {
         List<Note> notes = noteRepository.findAll();
-        List<NoteModel> mNotes = converter.convertList(notes);
-        return mNotes;
+        return converter.convertList(notes);
+    }
+
+    public List<NoteModel> getNotes(Pageable pageable) {
+        return converter.convertList(noteRepository.findAll(pageable).getContent());
+    }
+
+    public int getTotalPages(Pageable pageable) {
+       return noteRepository.findAll(pageable).getTotalPages();
     }
 
     public NoteModel getByNameAndTitle(String name, String title) {

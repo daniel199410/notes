@@ -6,6 +6,7 @@ import com.notes.core.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -19,8 +20,13 @@ public class NoteController {
     NoteService service;
 
     @GetMapping("/notes")
-    public List<NoteModel> getNotes() {
-        return service.getNotes();
+    public List<NoteModel> getNotes(Pageable pageable) {
+        return service.getNotes(pageable);
+    }
+
+    @GetMapping("/notes/totalPages")
+    public int getNotesCount(Pageable pageable) {
+        return service.getTotalPages(pageable);
     }
 
     @GetMapping("/note/{id}")
