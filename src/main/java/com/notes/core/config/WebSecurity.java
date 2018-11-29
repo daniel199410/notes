@@ -9,21 +9,28 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 import com.notes.core.service.UserService;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
+    private final UserService userDetailService;
+
     @Autowired
-    @Qualifier("userService")
-    private UserService userDetailService;
+    public WebSecurity(@Qualifier("userService") UserService userDetailService) {
+        this.userDetailService = userDetailService;
+    }
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailService);
+        auth.userDetailsService(userDetailService).passwordEncoder(NoOpPasswordEncoder.getInstance());
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        super.configure(http);
+        http.csrf().disable().authorizeRequests().antMatchers("/login").permitAll().anyRequest().authenticated()
+                .and().addFilterBefore(new LoginFilter("/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }
